@@ -1,0 +1,117 @@
+/* Add this new rule to create a grid for the lessons */
+.lessons-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+  gap: 20px; /* Space between items */
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.search-bar {
+  width: 300px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: border 0.3s ease;
+}
+.search-bar:focus {
+  border-color: #007bff;
+}
+
+/* Style the individual lesson item for a more appealing design */
+.lesson-item {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.lesson-item:hover {
+  transform: scale(1.05);
+}
+
+/* Ensure the image fits within the card */
+.product-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* Adjust the heading and text styles */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  header h1 {
+    font-family: "Satisfy", cursive;
+    font-size: 48px;
+    color: #000080; /* Navy blue for title */
+  }
+h3 {
+  color: #343a40;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+p {
+  color: #555;
+  margin: 5px 0;
+}
+
+/* Rating styling */
+.fas.fa-star {
+  color: #ffc107;
+}
+
+.far.fa-star {
+  color: #e4e5e9;
+}
+
+/* Button styles */
+button {
+  font-size: 14px;
+  background-color: #6f42c1;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #5a36a3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+span {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+#app .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+  }
+
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+  }
