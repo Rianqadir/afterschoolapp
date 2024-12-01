@@ -50,7 +50,7 @@
                 <div class="lessons-container">
                 <div v-for="lesson in sortedLessons" :key="lesson.id">
                     <figure>
-                        <img v-bind:src="lesson.image" alt="Lesson Icon" class="product-icon">
+                        <img v-bind:src="'/static/images/' + lesson.image" alt="Lesson Icon" class="product-icon">
                     </figure>
                     <h3>{{ lesson.subject }}</h3>
                     <p>Location: {{ lesson.location }}</p>
