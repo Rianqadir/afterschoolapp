@@ -50,7 +50,7 @@
                 <div class="lessons-container">
                 <div v-for="lesson in sortedLessons" :key="lesson.id">
                     <figure>
-                        <img v-bind:src="'/static/images/' + lesson.image" alt="Lesson Icon" class="product-icon">
+                        <img v-bind:src="lesson.image" alt="Lesson Icon" class="product-icon">
                     </figure>
                     <h3>{{ lesson.subject }}</h3>
                     <p>Location: {{ lesson.location }}</p>
@@ -158,7 +158,7 @@
     { "id": 7, "subject": "Music", "location": "Bristol", "price": 27, "spaces": 5, "image": "backend/static/images/music.png", "addedToCart": 0, "rating": 3 },
     { "id": 8, "subject": "Chemistry", "location": "Glasgow", "price": 32, "spaces": 5, "image": "backend/static/images/chemistry.png", "addedToCart": 0, "rating": 5 },
     { "id": 9, "subject": "Physics", "location": "Edinburgh", "price": 28, "spaces": 5, "image": "backend/static/images/physics.png", "addedToCart": 0, "rating": 4 },
-    { "id": 10, "subject": "Biology", "location": "Cardiff", "price": 24, "spaces": 5, "image": "backend/static/images/biology.png", "addedToCart": 0, "rating": 3 }
+    { "id": 10, "subject": "Biology", "location": "Cardiff", "price": 24, "spaces": 5, "image": "/backend/static/images/biology.png", "addedToCart": 0, "rating": 3 }
 ],
                         sortingOptions:  [
                     { value: "price-asc", label: "Price: Low to High" },
