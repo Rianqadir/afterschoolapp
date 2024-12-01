@@ -1,4 +1,4 @@
- [
+lessons: [
     { "id": 1, "subject": "Maths", "location": "London", "price": 20, "spaces": 5, "image": "backend/static/images/maths.png", "addedToCart": 0, "rating": 4 },
     { "id": 2, "subject": "English", "location": "Birmingham", "price": 25, "spaces": 5, "image": "backend/static/images/english.png", "addedToCart": 0, "rating": 3 },
     { "id": 3, "subject": "Science", "location": "Manchester", "price": 30, "spaces": 5, "image": "backend/static/images/science.png", "addedToCart": 0, "rating": 5 },
