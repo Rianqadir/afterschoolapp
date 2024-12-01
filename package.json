@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "lodash": "^4.17.21",
+    "mongodb": "^6.10.0",
+    "morgan": "^1.10.0",
+    "mustache": "^4.2.0",
+    "properties-reader": "^2.3.0",
+    "save": "^2.9.0"
+  },
+  "name": "cw",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node Fetch-server/app.js  ",
+    "deploy": "gh-pages -d dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rianqadir/After-school-app.git"
+  },
+  "author": "Rian Qadir",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Rianqadir/After-school-app/issues"
+  },
+  "homepage": "https://github.com/Rianqadir/After-school-app/index.html",
+  "description": "",
+  "devDependencies": {
+    "gh-pages": "^6.2.0"
+  }
+}

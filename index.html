@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <title>After School App</title>
+    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+    <link rel="stylesheet" href="/Frontend/css.css" />
+
+    <style>
+        .product-icon {
+            width: 50px;
+            height: 50px;
+        }
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        form input, form select {
+            display: block;
+            margin: 5px 0;
+            padding: 8px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="search-container">
+            <input v-model="searchQuery" type="text" class="search-bar" placeholder="Search lessons...">
+        </div>
+        <header>
+            <h1>{{ sitename }}</h1>
+            <button v-on:click="toggleCart" :disabled="cart.length === 0">
+                {{ itemsInTheCart }} <span class="fas fa-shopping-cart"></span> Checkout
+            </button>
+        </header>
+
+        <main>
+            <div v-if="showProduct">
+                <h2>Sort By:</h2>
+                <select v-model="sortAttribute" @change="sortLessons">
+                    <option v-for="option in sortingOptions" :value="option.value" :key="option.value">
+                        {{ option.label }}
+                    </option>
+                </select>
+                
+                
+                <div class="lessons-container">
+                <div v-for="lesson in sortedLessons" :key="lesson.id">
+                    <figure>
+                        <img v-bind:src="lesson.image" alt="Lesson Icon" class="product-icon">
+                    </figure>
+                    <h3>{{ lesson.subject }}</h3>
+                    <p>Location: {{ lesson.location }}</p>
+                    <p>Price: ${{ lesson.price }}</p>
+                    <p>Spaces left: {{ spacesLeft(lesson) }}</p>
+
+                    <!-- 5-star rating system -->
+                        <div>
+                            <!-- Filled stars for the rating -->
+                            <span v-for="n in lesson.rating" :key="'filled-' + n">
+                                <i class="fas fa-star"></i>
+                            </span>
+                            
+                            <!-- Empty stars for the remaining stars -->
+                            <span v-for="n in 5 - lesson.rating" :key="'empty-' + n">
+                                <i class="far fa-star"></i>
+                            </span>
+                        </div>
+
+                    <!-- Disable the button if no spaces are left and show a message -->
+                    <button v-on:click="addToCart(lesson)" :disabled="spacesLeft(lesson) === 0">
+                        Add to Cart
+                    </button>
+                    <span v-if='spacesLeft(lesson) === 0'>All out!</span>
+                    <span v-else-if=" spacesLeft(lesson) < 5">Only {{ spacesLeft(lesson) }} left!</span>
+                    <span v-else>Buy now!</span>
+                    <hr>
+                </div>
+            </div>
+        </div>
+            
+            <div v-else>
+                <h1>Shopping Cart</h1>
+                <ul>
+                    <li v-for="lesson in cart" :key="lesson.id">
+                        {{ lesson.subject }} - ${{ lesson.price }} ({{ lesson.addedToCart }} in cart)
+                        <button v-on:click="removeFromCart(lesson)">Remove</button>
+                      </li>
+                </ul>
+                <h3>Total: ${{ totalCost }}</h3>
+
+
+                <form @submit.prevent="checkout">
+                    <label>First Name: <input type="text" v-model.trim="firstName"></label>
+                    <label>Last Name: <input type="text" v-model.trim="lastName"></label>
+                    <label>Address: <input type="text" v-model.trim="address"></label>
+                    <label>City: <input type="text" v-model.trim="city"></label>
+                    <label><strong>State:</strong>
+                        <select v-model="order.state" class="form-control">
+                            <option disabled value="">Select a State</option>
+                            <option v-for="stateObj in states" :key="stateObj.key" :value="stateObj.value">
+                                {{ stateObj.value }}
+                            </option>
+                        </select>
+                    </label>
+                                     
+                    <label>Zip/Postal Code: <input type="number" v-model.number="postalCode"></label>
+                    <label>Phone: <input type="text" v-model="phone"></label>
+                    
+                    <button :disabled="!validCheckout">Checkout</button>
+                </form>
+
+                <!-- Display order information after submission -->
+                    <div v-if="orderSubmitted">
+                        <h2>Order submitted! Thank you for your purchase.</h2>
+                        <p>First Name: {{ order.firstName }}</p>
+                        <p>Last Name: {{ order.lastName }}</p>
+                        <p>Address: {{ order.address }}</p>
+                        <p>City: {{ order.city }}</p>
+                        <p>Zip: {{ order.zip }}</p>
+                        <p>State: {{ order.state }}</p>
+                    </div>
+                </div>
+                <button v-on:click="toggleCart">Go Back</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let webstore = new Vue({
+            el: '#app',
+            imagesBaseURL: "https://after-school-app.onrender.com/",
+            serverBaseURL:"https://after-school-app.onrender.com/",
+
+
+            data: { 
+                sitename: "After School App",
+                showProduct: true,
+                sortAttribute: "subject",
+                orderSubmitted: false,
+                firstName: '',
+                lastName: '',
+                address: '',
+                city: '',
+                state: '',
+                postalCode: '',
+                phone: '',
+                lessons: [
+    { "id": 1, "subject": "Maths", "location": "London", "price": 20, "spaces": 5, "image": "/backend/static/images/maths.png", "addedToCart": 0, "rating": 4 },
+    { "id": 2, "subject": "English", "location": "Birmingham", "price": 25, "spaces": 5, "image": "/backend/static/images/english.png", "addedToCart": 0, "rating": 3 },
+    { "id": 3, "subject": "Science", "location": "Manchester", "price": 30, "spaces": 5, "image": "/backend/static/images/science.png", "addedToCart": 0, "rating": 5 },
+    { "id": 4, "subject": "History", "location": "Leeds", "price": 35, "spaces": 5, "image": "/backend/static/images/history.png", "addedToCart": 0, "rating": 2 },
+    { "id": 5, "subject": "Geography", "location": "Liverpool", "price": 18, "spaces": 5, "image": "/backend/static/images/geography.png", "addedToCart": 0, "rating": 4 },
+    { "id": 6, "subject": "Art", "location": "Oxford", "price": 22, "spaces": 5, "image": "/backend/static/images/art.png", "addedToCart": 0, "rating": 5 },
+    { "id": 7, "subject": "Music", "location": "Bristol", "price": 27, "spaces": 5, "image": "/backend/static/images/music.png", "addedToCart": 0, "rating": 3 },
+    { "id": 8, "subject": "Chemistry", "location": "Glasgow", "price": 32, "spaces": 5, "image": "/backend/static/images/chemistry.png", "addedToCart": 0, "rating": 5 },
+    { "id": 9, "subject": "Physics", "location": "Edinburgh", "price": 28, "spaces": 5, "image": "/backend/static/images/physics.png", "addedToCart": 0, "rating": 4 },
+    { "id": 10, "subject": "Biology", "location": "Cardiff", "price": 24, "spaces": 5, "image": "/backend/static/images/biology.png", "addedToCart": 0, "rating": 3 }
+],
+                        sortingOptions:  [
+                    { value: "price-asc", label: "Price: Low to High" },
+                    { value: "price-desc", label: "Price: High to Low" },
+                    { value: "rating-asc", label: "Rating: Low to High" },
+                    { value: "rating-desc", label: "Rating: High to Low" },
+                    { value: "subject-asc", label: "Title: A to Z" },
+                    { value: "subject-desc", label: "Title: Z to A" },
+                    { value: "location-asc", label: "Location: A to Z" },
+                    { value: "location-desc", label: "Location: Z to A" },
+                    { value: "spaces-asc", label: "Spaces Left: Low to High" },
+                    { value: "spaces-desc", label: "Spaces Left: High to Low" }
+                ],
+                cart: [],
+                    states: [
+                        { key: "CA", value: "California" },
+                        { key: "TX", value: "Texas" },
+                        { key: "NY", value: "New York" },
+                        { key: "FL", value: "Florida" },
+                        // Add more states as needed
+                    ],
+                    order: { // Initialize the order object
+                        firstName: '',
+                        lastName: '',
+                        address: '',
+                        city: '',
+                        zip: '',
+                        state: ''
+                    },
+            },
+            methods: {
+                toggleCart() {
+                    this.showProduct = !this.showProduct;
+                },
+                addToCart(lesson) {
+                    if (lesson.spaces > lesson.addedToCart) {
+                        lesson.addedToCart++;
+                        this.cart.push(lesson);
+                    }
+                },
+                removeFromCart(lesson) {
+    // Decrease the addedToCart count for the lesson
+    if (lesson.addedToCart > 0) {
+        lesson.addedToCart--;
+    }
+
+    // If the addedToCart count is zero, remove the lesson from the cart
+    if (lesson.addedToCart === 0) {
+        this.cart = this.cart.filter(item => item.id !== lesson.id);
+    }
+}
+,
+
+                sortLessons() {
+                const [sortAttr, order] = this.sortAttribute.split('-'); // Split into attribute and order
+                this.lessons.sort((a, b) => {
+                    if (order === 'asc') {
+                        return a[sortAttr] > b[sortAttr] ? 1 : -1;
+                    } else {
+                        return a[sortAttr] < b[sortAttr] ? 1 : -1;
+                    }
+                });
+
+                },
+                checkout() {
+                    // Update the spaces for each lesson in the cart
+                    this.cart.forEach(lesson => {
+                        lesson.spaces -= lesson.addedToCart;
+                        lesson.addedToCart = 0; // Reset the addedToCart count
+                    });
+
+                    // Clear the cart after updating lessons
+                    this.cart = []; 
+
+                    // Populate the order object
+                    this.order = {
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        address: this.address,
+                        city: this.city,
+                        zip: this.postalCode,
+                        state: this.order.state // Correctly use the selected state value
+                    };
+
+                    this.orderSubmitted = true;
+
+                    // Show a confirmation message
+                    alert('Your order has been successfully submitted!');
+                },
+
+
+
+                spacesLeft(lesson) {
+                    return lesson.spaces - lesson.addedToCart;
+                }
+            },
+            computed: {
+    sortedLessons() {
+        return this.lessons.slice().sort((a, b) => {
+            switch (this.sortAttribute) {
+                case 'subject-asc':
+                    return a.subject.localeCompare(b.subject);
+                case 'subject-desc':
+                    return b.subject.localeCompare(a.subject);
+                case 'price-asc':
+                    return a.price - b.price;
+                case 'price-desc':
+                    return b.price - a.price;
+                case 'rating-asc':
+                    return a.rating - b.rating;
+                case 'rating-desc':
+                    return b.rating - a.rating;
+                case 'location-asc':
+                    return a.location.localeCompare(b.location);
+                case 'location-desc':
+                    return b.location.localeCompare(a.location);
+                case 'spaces-asc':
+                    return this.spacesLeft(a) - this.spacesLeft(b);
+                case 'spaces-desc':
+                    return this.spacesLeft(b) - this.spacesLeft(a);
+                default:
+                    return 0;
+            }
+        });
+    }
+,
+                    filteredLessons() {
+    return this.sortedLessons.filter(lesson =>
+        lesson.subject.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+},
+                itemsInTheCart() {
+                    return this.cart.length || "";
+                },
+                totalCost() {
+                    return this.cart.reduce((sum, lesson) => sum + lesson.price, 0);
+                },
+                validCheckout() {
+                    const nameValid = /^[a-zA-Z]+$/.test(this.firstName) ;
+                    const phoneValid = /^[0-9]+$/.test(this.phone);
+                    
+                  
+
+                    return nameValid && phoneValid  ;
+                }
+            }
+        
+        });
+    </script>
+</body>
+</html>
+
+
+
+
