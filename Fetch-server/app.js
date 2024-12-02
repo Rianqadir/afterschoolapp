@@ -55,6 +55,7 @@ app.get('/collection/:collectionName', async (req, res, next) => {
     }
 });
 
+app.use('/collection/lessons', express.static(path.join(__dirname, '../backend/Static/images')));
 // Route to get a specific document by ID from a collection
 app.get('/collection/:collectionName/:id', async (req, res, next) => {
     const { collectionName, id } = req.params;
